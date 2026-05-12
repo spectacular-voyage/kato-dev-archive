@@ -1,0 +1,21 @@
+workspaceId: da7fa4de-adc2-41bb-99be-8dcd8071babb
+defaultOutputDir: "."
+filenameTemplate: "conv.{YYYY}.{timestampHumane}-{snippetSlug}-{provider}.md"
+workspaceTimezone: "local"
+markdownFrontmatter:
+  includeFrontmatterInMarkdownRecordings: true
+  includeUpdatedInFrontmatter: true
+  addParticipantUsernameToFrontmatter: true
+  includeSessionIds: true
+  includeWorkspaceIds: true
+  includeRecordingIds: true
+  includeConversationEventKinds: false
+workspaceFeatureFlags:
+  writerIncludeCommentary: true
+  writerIncludeThinking: true
+  writerIncludeToolCalls: false
+  writerIncludeToolResults: false
+  writerIncludeDecisionPrompt: true
+  writerIncludeDecisionOptions: true
+  writerIncludeDecisionSelection: true
+  writerItalicizeUserMessages: false
