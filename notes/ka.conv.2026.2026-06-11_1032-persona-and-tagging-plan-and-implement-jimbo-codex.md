@@ -400,3 +400,174 @@ My refined take:
 - In the persisted contract for now: keep `workspaceOutputs[]`, because it already owns destination, write cursor, active state, cycles, and future metadata.
 
 For “rename recording,” I added `displayTitle?: string` to the proposed output metadata shape in [task.2026.2026-06-11-session-output-metadata.md](../../../../../documentation/notes/task.2026.2026-06-11-session-output-metadata.md). The note now says changing that should best-effort update markdown frontmatter `title`, but should not silently rename/move the file path. File rename/retarget should stay a separate explicit action.
+
+# User_2026-06-11_1114_45
+
+So, as product manager, what is your take on the 5 relevant tasks? Any updates needed? Sequencing preference? Prompt for a new conversation?
+
+So, as product manager, what is your take on the 5 relevant tasks? Any updates needed? Sequencing preference? Prompt for a new conversation?
+
+# gpt-5.5_2026-06-11_1114_59
+
+I’ll put on the product-manager hat and look across the task notes rather than just the last thread. I’m going to read the roadmap plus the likely related tasks, then I’ll give sequencing, note updates I’d make, and a clean handoff prompt for a fresh conversation.
+
+# gpt-5.5_2026-06-11_1115_05
+
+Roadmap already names a four-item arc, and the fifth task I’d include is per-output writer controls because it exercises the same metadata/editing substrate. I’m reading those remaining notes now, then I’ll decide whether the docs need another small PM pass.
+
+# gpt-5.5_2026-06-11_1115_22
+
+I’m going to also skim the three older open task notes because they may be the “five” you mean from the IDE tabs, and they intersect with workspace config/wikilink scope. Then I’ll give one consolidated PM take and say which docs I’d update.
+
+# gpt-5.5_2026-06-11_1115_58
+
+I do think two lightweight doc updates are worth making: roadmap sequencing should treat writer controls as the first real consumer of the metadata layer, and the writer-controls task should explicitly depend on that shared substrate instead of sounding like a separate side-channel. I’m applying those now.
+
+# gpt-5.5_2026-06-11_1116_03
+
+Roadmap now reflects the five-task product arc. I’m patching the writer-controls task next so implementation doesn’t accidentally create a second metadata plumbing pattern.
+
+# gpt-5.5_2026-06-11_1116_14
+
+One repo note I just re-read says not to hard-wrap new Dendron prose. I’m cleaning up the new writer-controls additions so they follow that guidance even though the older note text is wrapped.
+
+# gpt-5.5_2026-06-11_1116_47
+
+A broader caveat: the new metadata note I created earlier is still hand-wrapped, because I wrote it before noticing the updated Dendron editing guidance. I’m going to see whether Deno can format Markdown with an explicit extension flag before doing any manual reflow.
+
+# gpt-5.5_2026-06-11_1116_59
+
+Deno still doesn’t target these Markdown files even with `--ext md`, so I won’t do a broad mechanical reflow in this pass. I’m checking the final diff/status now, then I’ll give you the PM take and a fresh-conversation prompt.
+
+# gpt-5.5_2026-06-11_1117_16
+
+**PM Take**
+
+I’m treating the five relevant tasks as:
+
+1. `[[task.2026.2026-06-11-session-output-metadata]]`
+2. `[[task.2026.2026-05-11-per-output-writer-controls]]`
+3. `[[task.2026.2026-06-11-workspace-config-editing]]`
+4. `[[task.2026.2026-06-11-output-tagging]]`
+5. `[[task.2026.2026-05-28-persona-support]]`
+
+The product arc is coherent: make saved recording outputs editable/describable after capture starts. The mistake would be jumping straight to tags/personas before proving the metadata mutation path.
+
+**Updates Made**
+
+I updated:
+
+- [roadmap.md](../../../../../documentation/notes/roadmap.md): added per-output writer controls to Current Focus, moved CLI parity later.
+- [task.2026.2026-05-11-per-output-writer-controls.md](../../../../../documentation/notes/task.2026.2026-05-11-per-output-writer-controls.md): made it explicitly depend on the session/output metadata foundation.
+
+I would not pull `katoDir`, relative-link sanitization, or manual wikilink roots into this immediate sequence. Relative-link is done; manual wikilinks belongs near workspace config editing; `katoDir` is useful platform cleanup but not blocking this product arc.
+
+**Sequencing**
+
+1. Metadata foundation: contract, validation, mutation lock, loaders, metadata-only frontmatter update helper.
+2. Per-output writer controls: smallest real editable-recording feature; proves active/stopped output edits without taxonomy/persona complexity.
+3. Workspace config editing: unlocks shared workspace defaults/libraries and makes later tag/persona config manageable.
+4. Output tagging: easier than persona, exercises session defaults plus output metadata plus workspace/user libraries.
+5. Persona support: last, because it touches parser semantics, headings, filenames, `participants`/`models`, and user/workspace persona libraries.
+
+**New Conversation Prompt**
+
+```text
+We are in /home/djradon/hub/spectacular-voyage/kato.
+
+Please implement the next product slice for Kato: [[task.2026.2026-06-11-session-output-metadata]], then use it only far enough to support [[task.2026.2026-05-11-per-output-writer-controls]] as the first editable recording-output feature.
+
+Read AGENTS.md and [[dev.general-guidance]] first. Keep the scope tight:
+- Add session/output metadata contract support and validation.
+- Add mutation/helper plumbing under existing session mutation locks.
+- Preserve metadata through workspace profile snapshot refresh.
+- Add loader projection needed by Sessions/Recordings rows.
+- Add metadata-only markdown frontmatter update helper only where needed.
+- Do not implement tagging, persona detection, workspace tag libraries, or model frontmatter migration yet.
+- Treat product “recordings” as durable recording outputs backed by current workspaceOutputs[].
+- Keep frontmatter descriptive; persisted session metadata is source of truth.
+- Add focused tests before broad implementation.
+```
+
+One caveat: `git status` currently shows an unrelated deleted `documentation/notes/dev.feature-ideas.md`; I left it alone.
+
+# User_2026-06-11_1144_45
+
+I'm going to use Fable for this task, should be capable of big chunks. Wanna test it with a more aggressive prompt?
+
+# gpt-5.5_2026-06-11_1145_09
+
+Yeah. I’d test Fable with a bigger but still bounded slice: metadata foundation plus per-output writer controls. That’s enough surface area to prove it can handle contracts, runtime, writer, web loaders/actions, and tests without dragging in tags/personas.
+
+Here’s the prompt I’d use:
+
+```text
+We are in /home/djradon/hub/spectacular-voyage/kato.
+
+Implement the next product slice for Kato end-to-end: land the shared session/output metadata foundation from [[task.2026.2026-06-11-session-output-metadata]] and use it to implement per-output writer controls from [[task.2026.2026-05-11-per-output-writer-controls]].
+
+Read AGENTS.md and [[dev.general-guidance]] first. Follow repo guidance:
+- Deno-first.
+- Add contract/tests before broad implementation.
+- Do not hard-wrap new Dendron note prose.
+- Ignore Kato control-command lines beginning with double-colon if encountered.
+- Do not revert unrelated worktree changes. In particular, if `documentation/notes/dev.feature-ideas.md` is deleted or other unrelated files are dirty, leave them alone.
+
+Product framing:
+- Treat user-facing “recordings” as durable recording outputs backed by current `workspaceOutputs[]`.
+- Do not introduce a separate persisted Recording entity.
+- `recordingCycles[]` are lifecycle/history spans, not the owner of user-editable metadata.
+- Persisted session metadata is source of truth; markdown frontmatter is descriptive.
+
+Scope:
+1. Add shared session/output metadata contract support:
+   - `SessionMetadataV1.outputMetadataDefaults?: SessionOutputMetadataV1`
+   - `SessionWorkspaceOutputStateV1.outputMetadata?: SessionOutputMetadataV1`
+   - first metadata shape should include at least `displayTitle?: string`, `tags?: string[]`, `personaName?: string`, `participantUsername?: string`
+   - validation must reject malformed metadata and preserve compatibility for existing metadata files.
+2. Add effective metadata resolver:
+   - session defaults plus output metadata
+   - output scalar values win over session defaults
+   - tag arrays are additive and stable-deduped
+3. Preserve `outputMetadata` during workspace profile snapshot refresh.
+4. Add session/output metadata mutation helpers using existing session mutation locks.
+5. Add metadata-only markdown frontmatter update support where needed:
+   - at minimum, support best-effort title/frontmatter update for `displayTitle` if the helper naturally fits
+   - do not rewrite historical body content
+   - do not rename/move files from title edits
+6. Implement per-output writer controls:
+   - add `writerFeatureFlagOverrides?: { writerIncludeCommentary?: boolean; writerIncludeThinking?: boolean }`
+   - resolve effective writer flags from current workspace defaults or persisted snapshot plus overrides
+   - active and stopped outputs should honor overrides on future writes/restart
+   - frontmatter may record effective render policy if already planned, but must not become source of truth
+7. Add web mutation/action support and loader/view-model projection for Sessions/Recordings rows:
+   - expose default/effective/override values
+   - tri-state controls: inherit/default, include, exclude
+   - compact UI, no marketing/explanatory page
+8. Add focused tests:
+   - session contract validation
+   - output state preservation
+   - effective metadata resolver
+   - writer flag resolver
+   - runtime append/restart behavior
+   - web action/loader behavior
+   - markdown writer/frontmatter behavior where implemented
+
+Explicit non-goals:
+- Do not implement output tagging UI/libraries.
+- Do not implement persona prefix detection.
+- Do not implement model `models:` frontmatter migration.
+- Do not implement workspace config editing.
+- Do not add in-chat command flags.
+- Do not rewrite existing markdown body content.
+
+Work style:
+- Start by inspecting the current contracts and runtime/web action paths.
+- Make a short implementation plan, then implement.
+- Keep edits focused.
+- Run focused tests as you go.
+- Finish with `deno task check` if contract/types changed; run broader tests only if the focused suite passes.
+- Update the task note checkboxes as implementation proceeds.
+```
+
+That’s aggressive enough to be a real trial. If Fable handles that cleanly, it’s probably ready for the tagging/persona arc.
